@@ -1,0 +1,191 @@
+#include <stdio.h>
+#include "invertedIndex.h"
+#include <string.h>
+#include <stdlib.h>
+#include <ctype.h>  
+
+
+
+static InvertedIndexBST insertTree (InvertedIndexBST t,  char *word, char* fileName);
+//first word doesnt exist in tree
+//      - Create node
+//      - insert in the right place
+//      - add filename to linked list
+//second word does exist
+//      - find the existing node
+//      - update filename linked list, adding this filename (be careful not to add the same file twice)
+//      infix
+
+char *normaliseWord(char *str) {
+        int j = strlen(str) - 1;
+        while (str[j] == ' ') {
+                str[j] = '\0';
+                j--;
+        }
+        int i = 0;
+        while (str[i] != '\0') {
+        //remove spaces by shifting counting from str[0]
+        //strlnth - 1 until != ' ' 
+                if (i == 0) {
+                        int z = 0;
+                        while (str[z] == ' ') {
+                                int y = 0;
+                                while (str[y] != '\0') {
+                                        str[y] = str[y+1];
+                                        y++;
+                                }
+                                
+                        }
+                }           
+                str[i] = tolower(str[i]);
+                if (str[i] == '?' || str[i] == ',' || str[i] == ';' || str[i] == '.') {
+                        if (str[i + 1] == '\0') {
+                                str[i] = '\0';
+                        }
+                }
+                i++;
+        }
+      
+        return str;
+}    
+        
+InvertedIndexBST generateInvertedIndex (char *collectionFilename) {
+    char *fileName = malloc(sizeof(char)*100);
+    FILE *collection = fopen(collectionFilename, "r");
+    InvertedIndexBST tree = NULL;
+    //read collection.txt and each file
+    while (fscanf(collection, "%s", fileName) == 1) {
+        FILE *currFile = fopen(fileName, "r"); 
+        char *word = malloc(sizeof(char)*100);
+        //read each word  
+        while (fscanf(currFile, "%s", word) == 1) {
+            //call newNode function
+            //call insert function
+            word = normaliseWord(word);
+            tree = insertTree(tree, word, fileName);
+        }
+    }
+    return tree;           
+}
+
+static InvertedIndexBST newNode (char *word, char* fileName) {
+         InvertedIndexBST BSTnode = malloc (sizeof(InvertedIndexBST));
+         int x = strlen(word) + 1;
+         //x = x + 1;
+         char *copy = malloc(sizeof(char)*x);
+         char *nodeWord = strcpy(copy, word);
+        //malloc array sizeof(char*strlen(word) + 1) and strcpy
+         BSTnode->word = nodeWord;
+         //BSTnode->fileList = newLLNode(fileName);
+        //FileList LLnode = malloc(sizeof(fileList));
+        // pointer->fileList = LLnode;
+        //pointer->fileList->filename = fileName;
+        //pointer->fileList->next = fileName;
+       // pointer->fileList->tf = 0;
+       // pointer->fileList->next = NULL;
+        BSTnode->left = NULL;
+        BSTnode->right = NULL;
+        return BSTnode;
+}
+        
+static InvertedIndexBST insertTree (InvertedIndexBST t,  char *word, char* fileName) {
+        if (t == NULL) {
+                return (newNode(word, fileName));
+        }
+        else if (strcmp(t->word, word) > 0) {
+                t->left = insertTree(t->left, word, fileName);
+        }
+        else if (strcmp(t->word, word) < 0) {
+                t->right = insertTree(t->right, word, fileName); 
+        }
+        else if (strcmp(t->word, word) == 0) {
+                //updateLL(t, fileName, list);
+        }
+        return t;
+} 
+void printInvertedIndex(InvertedIndexBST tree) {
+        FILE *fp = fopen ("invertedIndex.txt", "a");   
+        if (tree == NULL) {
+                return;
+        }
+        
+        printInvertedIndex (tree->left);
+        
+        // Print info of root node
+        fprintf (fp, "%s", tree->word);
+        fflush(fp);
+        /*FileList curr = tree->fileList;
+        while (curr->next != NULL) {
+                fprintf(fp, "%s", curr->filename);
+                curr = curr->next;
+        }*/
+        //printf("%s", tree->word);
+        //printf("\n");
+        fprintf(fp, "\n");
+        fflush(fp);
+        printInvertedIndex (tree->right);
+
+
+}  
+
+/*void updateLL (InvertedIndexBST t, char* fileName)  {
+        FileList curr = t->fileList;
+        int sameFile = 0;
+        if (curr == NULL) {
+                curr = newLLNode(fileName);
+                t->fileList = curr;
+        }
+        else {
+                while (curr->next != NULL) {
+                        if (strcmp(curr->filename, fileName) == 0) {
+                                break;
+                                //insert in order
+                                //change tf
+                                //how to get total words of file??
+                                sameFile = 1;
+                        }
+                        curr = curr->next;
+                }
+                if (sameFile == 0) {
+                        curr->next = newLLNode(fileName);
+                }
+}
+
+FileList newLLNode (char *fileName) {
+         FileList LLnode = malloc (sizeof(FileList));
+         int x = strlen(fileName) + 1;
+         char *copy = malloc(sizeof(char)*x);
+         char *nodeFileName = strcpy(copy, word);
+         LLnode->filename = nodeFileName;
+         LLnode->tf = 0;
+         LLnode->next = NULL;
+         return LLnode;
+}
+
+TfIdfList calculateTfIdf(InvertedIndexBST tree, char *searchWord , int D) }
+        InvertedIndexBST t = binarySearch(tree, searchWord);
+        if (t != NULL) {
+                FileList curr = t->fileList;
+                while (curr->next != NULL) {
+                                              
+
+
+}    
+
+static InvertedIndexBST binarySearch (InvertedIndexBST t,  char *word) {
+        if (t == NULL) {
+                return NULL;
+        }
+        else if (strcmp(t->word, word) > 0) {
+                return binarySearch(t->left, word, fileName);
+        }
+        else if (strcmp(t->word, word) < 0) {
+                return binarySearch(t->right, word, fileName); 
+        }
+        else if (strcmp(t->word, word) == 0) {
+                return t
+        }
+        return t;
+} 
+
+double calculate (double tf,   */
